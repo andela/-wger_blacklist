@@ -98,3 +98,4 @@ class DeleteAdminNoteTestCase(WorkoutManagerDeleteTestCase):
 
 delete_testcase_add_methods(DeleteAdminNoteTestCase)
 
+
