@@ -24,7 +24,11 @@ $(document).ready( function () {
 </thead>
 <tbody>
 {% for current_user in user_table.users %}
-<tr>
+<tr {% if current_user.obj.is_active %}
+        bgcolor="#b7ffc4"
+    {% else %}
+        bgcolor="#ffb7d0"
+    {% endif %} >
     <td>
         {{current_user.obj.pk}}
     </td>
