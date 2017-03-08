@@ -21,6 +21,7 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+tags
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -57,6 +58,7 @@ target/
 
 # IDE
 .idea/
+.vscode/
 
 # External Libraries
 wger/core/static/bower_components
