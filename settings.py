@@ -25,11 +25,7 @@ DATABASES = {
 }
 
 # Make this unique, and don't share it with anybody.
-<<<<<<< HEAD
 SECRET_KEY = 'ao%kcw*2rp%ne(1s8pg6&y50#bp7^#l$&o39epb02-huec8y-f'
-=======
-SECRET_KEY = '&@*yh!r^lw60+=c-%l(_1r6qgeksi9wtgp-#_zq5&1c4o3w%8r'
->>>>>>> develop
 
 # Your reCaptcha keys
 RECAPTCHA_PUBLIC_KEY = ''
@@ -43,11 +39,8 @@ SITE_URL = 'http://localhost:8000'
 
 # Path to uploaded files
 # Absolute filesystem path to the directory that will hold user-uploaded files.
-<<<<<<< HEAD
 MEDIA_ROOT = '/Users/olivermunala/.local/share/wger/media'
-=======
-MEDIA_ROOT = '/Users/sharonwanjikunjihia/.local/share/wger/media'
->>>>>>> develop
+
 MEDIA_URL = '/media/'
 
 # Allow all hosts to access the application. Change if used in production.
