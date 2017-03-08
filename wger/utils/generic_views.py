@@ -77,8 +77,8 @@ class WgerPermissionMixin(object):
 
         if self.login_required or self.permission_required:
             if not request.user.is_authenticated():
-                return HttpResponseRedirect(reverse_lazy('core:user:login')
-                                            + '?next={0}'.format(request.path))
+                return HttpResponseRedirect(reverse_lazy('core:user:login') +
+                                            '?next={0}'.format(request.path))
 
             if self.permission_required:
                 has_permission = False
@@ -325,6 +325,7 @@ class TextTemplateView(TemplateView):
     '''
     A regular templateView that sets the mime type as text/plain
     '''
+
     def render_to_response(self, context, **response_kwargs):
         response_kwargs['content_type'] = 'text/plain'
         return super(TextTemplateView, self).render_to_response(context, **response_kwargs)
