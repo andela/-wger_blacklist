@@ -116,6 +116,7 @@ class CacheKeyMapper(object):
         '''
         return self.WORKOUT_LOG_LIST.format(hash_value)
 
+
     def get_nutrition_plan(self, param):
         '''
         Return the nutrition plan key
