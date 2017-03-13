@@ -23,7 +23,6 @@ var/
 *.egg
 tags
 
-
 # PyInstaller
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
@@ -60,7 +59,6 @@ target/
 # IDE
 .idea/
 .vscode
-
 
 # External Libraries
 wger/core/static/bower_components
