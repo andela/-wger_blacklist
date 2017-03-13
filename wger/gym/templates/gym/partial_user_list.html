@@ -7,11 +7,84 @@
 $(document).ready( function () {
     /* Make table sortable */
     $('#main_member_list').DataTable({
-        paging: false,
+        paging: true,
         bFilter: true,
-        bInfo : false
+        bInfo : false,
+        iDisplayLength : 3
     });
 });
+</script>
+
+<script>
+     function doIt(){
+       var v = document.getElementById("mySelect").value;
+       if(v == 'All Users'){
+         document.getElementById('tbody').innerHTML = "{% for current_user in user_table.users %} \
+                                                           <tr {% if current_user.obj.is_active %} \
+                                                                   bgcolor='#b7ffc4' \
+                                                               {% else %} \
+                                                                   bgcolor='#ffb7d0' \
+                                                               {% endif %}> \
+                                                             <td>{{current_user.obj.pk}}</td> \
+                                                             <td><a href='{% url 'core:user:overview' current_user.obj.pk %}'>{{current_user.obj}}</a></td> \
+                                                             <td>{{current_user.obj.get_full_name}}</td> \
+                                                             <td data-order='{{current_user.last_log|date:'U'}}'>{{current_user.last_log|default:'-/-'}}</td> \
+                                                             {% if show_gym %} \
+                                                               <td> \
+                                                                 {% if current_user.obj.userprofile.gym_id %} \
+                                                                     <a href='{{ current_user.obj.userprofile.gym.get_absolute_url }}'> \
+                                                                     {{ current_user.obj.userprofile.gym }} \
+                                                                     </a> \
+                                                                 {% else %} \
+                                                                     -/- \
+                                                                 {% endif %}</td> \
+                                                               {% endif %} \
+                                                           </tr> \
+                                                       {% endfor %}";
+       }else if(v == 'Active Users'){
+         document.getElementById('tbody').innerHTML = "{% for current_user in user_table.users %} \
+                                                         {% if current_user.obj.is_active %} \
+                                                           <tr bgcolor='#b7ffc4'> \
+                                                             <td>{{current_user.obj.pk}}</td> \
+                                                             <td><a href='{% url 'core:user:overview' current_user.obj.pk %}'>{{current_user.obj}}</a></td> \
+                                                             <td>{{current_user.obj.get_full_name}}</td> \
+                                                             <td data-order='{{current_user.last_log|date:'U'}}'>{{current_user.last_log|default:'-/-'}}</td> \
+                                                             {% if show_gym %} \
+                                                               <td> \
+                                                                 {% if current_user.obj.userprofile.gym_id %} \
+                                                                     <a href='{{ current_user.obj.userprofile.gym.get_absolute_url }}'> \
+                                                                     {{ current_user.obj.userprofile.gym }} \
+                                                                     </a> \
+                                                                 {% else %} \
+                                                                     -/- \
+                                                                 {% endif %}</td> \
+                                                             {% endif %} \
+                                                           </tr> \
+                                                         {% endif %} \
+                                                       {% endfor %}";
+       }else if(v == 'Deactivated Users'){
+         document.getElementById('tbody').innerHTML = "{% for current_user in user_table.users %} \
+                                                         {% if not current_user.obj.is_active %} \
+                                                           <tr bgcolor='#ffb7d0'> \
+                                                             <td>{{current_user.obj.pk}}</td> \
+                                                             <td><a href='{% url 'core:user:overview' current_user.obj.pk %}'>{{current_user.obj}}</a></td> \
+                                                             <td>{{current_user.obj.get_full_name}}</td> \
+                                                             <td data-order='{{current_user.last_log|date:'U'}}'>{{current_user.last_log|default:'-/-'}}</td> \
+                                                             {% if show_gym %} \
+                                                               <td> \
+                                                                 {% if current_user.obj.userprofile.gym_id %} \
+                                                                     <a href='{{ current_user.obj.userprofile.gym.get_absolute_url }}'> \
+                                                                     {{ current_user.obj.userprofile.gym }} \
+                                                                     </a> \
+                                                                 {% else %} \
+                                                                     -/- \
+                                                                 {% endif %}</td> \
+                                                             {% endif %} \
+                                                           </tr> \
+                                                        {% endif %} \
+                                                      {% endfor %}";
+       }
+     }
 </script>
 
 <table class="table table-hover" id="main_member_list">
@@ -22,7 +95,7 @@ $(document).ready( function () {
     {% endfor %}
 </tr>
 </thead>
-<tbody>
+<tbody id='tbody'>
 {% for current_user in user_table.users %}
 <tr {% if current_user.obj.is_active %}
         bgcolor="#b7ffc4"
@@ -57,7 +130,13 @@ $(document).ready( function () {
 </tbody>
 </table>
 
-<div style="position: absolute; right: -130px; padding: 10px; top: 70px;">
-<span style="background-color: #ffb7d0;">&nbsp;</span> Deactivated user<br />
-<span style="background-color: #b7ffc4;">&nbsp;</span> Active user
+<div style="position: absolute; right: -150px; padding: 10px; top: 70px;">
+  <span style="background-color: #ffb7d0;">&nbsp;</span> Deactivated user<br />
+  <span style="background-color: #b7ffc4;">&nbsp;</span> Active user<br /><br />
+
+  <select id='mySelect' onchange="doIt()">
+    <option value="All Users">All Users</option>
+    <option value="Active Users">Active Users</option>
+    <option value="Deactivated Users">Deactivated Users</option>
+  </select>
 </div>
