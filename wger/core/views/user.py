@@ -512,7 +512,8 @@ class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
 
         for u in User.objects.select_related('usercache', 'userprofile__gym').all():
             out['members'].append({'obj': u,
-                                   'last_log': u.usercache.last_activity})
+                                   'last_log': u.usercache.last_activity,
+                                   'status': u.is_active})
 
         return out
 
