@@ -159,6 +159,18 @@ class PlanDailyCaloriesTestCase(WorkoutManagerTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'goal amount of calories')
 
+    def test_overview(self):
+        '''
+        Tests the overview
+        '''
+
+        # Plan has daily calories goal
+        self.user_login('test')
+
+        # Can find goal calories text
+        response = self.client.get(reverse('nutrition:plan:overview'))
+        self.assertEqual(response.status_code, 200)
+
 
 class PlanApiTestCase(api_base_test.ApiBaseResourceTestCase):
     '''
