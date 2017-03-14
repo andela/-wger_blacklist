@@ -508,11 +508,19 @@ class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         Return a list with the users, not really a queryset.
         '''
         out = {'admins': [],
-               'members': []}
+               'members': [],
+               'active':[],
+               'deactive': []}
 
         for u in User.objects.select_related('usercache', 'userprofile__gym').all():
             out['members'].append({'obj': u,
                                    'last_log': u.usercache.last_activity})
+
+        for active_user in User.objects.filter(is_active=True).select_related('usercache', 'userprofile__gym').all():
+            out['active'].append({'obj': active_user})
+
+        for deactive_user in User.objects.filter(is_active=False).select_related('usercache', 'userprofile__gym').all():
+            out['deactive'].append({'obj': deactive_user})
 
         return out
 
@@ -527,5 +535,7 @@ class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
                                           _('Name'),
                                           _('Last activity'),
                                           _('Gym')],
-                                 'users': context['object_list']['members']}
+                                 'users': context['object_list']['members'],
+                                 'active': context['object_list']['active'],
+                                 'deactive': context['object_list']['deactive']}
         return context
