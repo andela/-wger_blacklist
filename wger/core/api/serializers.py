@@ -25,6 +25,11 @@ from wger.core.models import (
     RepetitionUnit,
     WeightUnit)
 
+# User Registration Serializer
+class UserRegistrationSerializer(serializers.ModelSerializer):
+    '''User creation'''
+    class Meta:
+        model = user
 
 class UserprofileSerializer(serializers.ModelSerializer):
     '''
