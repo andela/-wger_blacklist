@@ -19,6 +19,8 @@ from django.contrib.auth.models import User
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 from wger.core.models import (
     UserProfile,
@@ -28,6 +30,7 @@ from wger.core.models import (
     RepetitionUnit,
     WeightUnit)
 from wger.core.api.serializers import (
+    UserRegistrationSerializer,
     UsernameSerializer,
     LanguageSerializer,
     DaysOfWeekSerializer,
@@ -38,6 +41,14 @@ from wger.core.api.serializers import (
 from wger.core.api.serializers import UserprofileSerializer
 from wger.utils.permissions import UpdateOnlyPermission, WgerPermission
 
+
+class UserViewSet(viewsets.ModelViewSet):
+    '''API endpoint for login and registration of user'''
+    serializer_class = UserRegistrationSerializer
+    http_method_names = ['post', 'get']
+    authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication,)
+    permission_classes = (IsAuthenticated)
+    queryset = User.objects.all().order_by('-date_joined')
 
 class UserProfileViewSet(viewsets.ModelViewSet):
     '''
