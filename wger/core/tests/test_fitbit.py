@@ -3,8 +3,6 @@ from unittest import TestCase
 from fitbit import Fitbit
 import copy, json, mock, requests_mock, unittest
 import sys
-sys.path.append('../')
-from views import user
 
 
 class TestFitbit(TestCase):
