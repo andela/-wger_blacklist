@@ -3,7 +3,6 @@ from unittest import TestCase
 from fitbit import Fitbit
 import copy, json, mock, requests_mock, unittest
 
-
 class TestFitbit(TestCase):
     client_kwargs = {
         'client_id': '228DDB',
