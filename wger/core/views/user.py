@@ -55,7 +55,7 @@ from wger.manager.models import (
     WorkoutSession,
     Workout
 )
-from wger.nutrition.models import NutritionPlan
+from wger.nutrition.models import NutritionPlan, Ingredient
 from wger.config.models import GymConfig
 from wger.weight.models import WeightEntry
 from wger.gym.models import (
@@ -63,6 +63,15 @@ from wger.gym.models import (
     GymUserConfig,
     Contract
 )
+
+from wger.exercises.models import (
+    Exercise,
+    Muscle,
+    ExerciseCategory
+)
+
+from fitbit import FitbitOauth2Client, Fitbit
+import base64, requests, datetime, decimal
 
 logger = logging.getLogger(__name__)
 
@@ -97,12 +106,12 @@ def delete(request, user_pk=None):
 
         # Forbidden if the user has not enough rights, doesn't belong to the
         # gym or is an admin as well. General admins can delete all users.
-        if not request.user.has_perm('gym.manage_gyms') and \
-                (not request.user.has_perm('gym.manage_gym') or
-                    request.user.userprofile.gym_id != user.userprofile.gym_id or
-                    user.has_perm('gym.manage_gym') or
-                    user.has_perm('gym.gym_trainer') or
-                    user.has_perm('gym.manage_gyms')):
+        if not request.user.has_perm('gym.manage_gyms') \
+                and (not request.user.has_perm('gym.manage_gym')
+                     or request.user.userprofile.gym_id != user.userprofile.gym_id
+                     or user.has_perm('gym.manage_gym')
+                     or user.has_perm('gym.gym_trainer')
+                     or user.has_perm('gym.manage_gyms')):
             return HttpResponseForbidden()
     else:
         user = request.user
@@ -149,17 +158,17 @@ def trainer_login(request, user_pk):
         return HttpResponseForbidden()
 
     # Changing between trainers or managers is not allowed
-    if request.user.has_perm('gym.gym_trainer') and \
-            (user.has_perm('gym.gym_trainer') or
-                user.has_perm('gym.manage_gym') or
-                user.has_perm('gym.manage_gyms')):
+    if request.user.has_perm('gym.gym_trainer') \
+            and (user.has_perm('gym.gym_trainer')
+                 or user.has_perm('gym.manage_gym')
+                 or user.has_perm('gym.manage_gyms')):
         return HttpResponseForbidden()
 
     # Check if we're switching back to our original account
     own = False
-    if (user.has_perm('gym.gym_trainer') or
-            user.has_perm('gym.manage_gym') or
-            user.has_perm('gym.manage_gyms')):
+    if (user.has_perm('gym.gym_trainer')
+            or user.has_perm('gym.manage_gym')
+            or user.has_perm('gym.manage_gyms')):
         own = True
 
     # Note: it seems we have to manually set the authentication backend here
@@ -529,3 +538,127 @@ class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
                                           _('Gym')],
                                  'users': context['object_list']['members']}
         return context
+
+@login_required
+def add_fitbit_support(request, code=None):
+    '''
+    Gets data from fitbit upon the user authorizing Wger to access their data
+    '''
+    template_data = {}
+    client_id = '228DDB'
+    client_secret = 'fbf2bdaeb30b9e8b5fd26d9cc1be8a5a'
+
+    fitbit_client = FitbitOauth2Client(client_id, client_secret)
+
+    if 'code' in request.GET:  # get token
+        code = request.GET.get("code", "")
+        form = {
+            'client_secret': client_secret,
+            'code': code,
+            'client_id': client_id,
+            'grant_type': 'authorization_code',
+            'redirect_uri': 'http://127.0.0.1:8000/en/user/add_fitbit'
+        }
+        headers = {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            "Authorization": 'Basic MjI4RERCOmZiZjJiZGFlYjMwYjllOGI1ZmQyNmQ5Y2MxYmU4YTVh'
+        }
+
+        response = requests.post(fitbit_client.request_token_url, form, headers=headers).json()
+
+        if "access_token" in response:
+            token = response['access_token']
+            user_id = response['user_id']
+            headers['Authorization'] = 'Bearer ' + token
+
+            response = requests.get(
+                'https://api.fitbit.com/1/user/' + user_id + '/profile.json',
+                headers=headers)
+            weight = response.json()['user']['weight']
+
+            # add weight to db
+            try:
+                entry = WeightEntry()
+                entry.weight = weight
+                entry.user = request.user
+                entry.date = datetime.date.today()
+                entry.save()
+                messages.success(request, _(
+                    'Successfully synced weight data.'))
+            except Exception as error:
+                if "UNIQUE constraint failed" in str(error):
+                    messages.info(request, _('Already synced up for today.'))
+
+            rn = requests.get('https://api.fitbit.com/1/user/-/foods/log/date/2017-03-18.json', headers=headers)
+
+            try:
+                # print('return val --> {}'.format(rn.json()['foods']))
+                for food in rn.json()['foods']:
+                    name = food.get('loggedFood').get('name')
+                    nutritionalValues = food.get('nutritionalValues')
+
+                    if nutritionalValues:
+                        energy = nutritionalValues.get('calories', 0)
+                        protein = nutritionalValues.get('protein', 0)
+                        carbohydrates = nutritionalValues.get('carbs', 0)
+                        fat = nutritionalValues.get('fat', 0)
+                        fibres = nutritionalValues.get('fiber', 0)
+                        sodium = nutritionalValues.get('sodium', 0)
+                    else:
+                        energy, protein, carbohydrates, fat, fibres, sodium = [0, 0, 0, 0, 0, 0]
+
+                    ingredient = Ingredient()
+                    if not Ingredient.objects.filter(name=name).exists():
+                        ingredient.user = request.user
+                        ingredient.language = Language.objects.get(short_name='en')
+                        ingredient.name = name
+                        ingredient.energy = energy
+                        ingredient.protein = float(protein)
+                        ingredient.carbohydrates = float(carbohydrates)
+                        ingredient.fat = float(fat)
+                        ingredient.fibres = float(fibres)
+                        ingredient.sodium = float(sodium)
+                        # import pdb; pdb.set_trace()
+                        ingredient.save()
+            except Exception as error:
+                print('Error -->{}'.format(error))
+
+                # if "UNIQUE constraint failed" in str(error):
+                #     messages.info(request, _('Already synced up for today.'))
+
+            ra = requests.get('https://api.fitbit.com/1/user/-/activities/date/2017-03-18.json', headers=headers)
+
+            if not ExerciseCategory.objects.filter(name='Fitbit'):
+                fitbit_category = ExerciseCategory()
+                fitbit_category.name = 'Fitbit'
+                fitbit_category.save()
+
+            try:
+                for detail in ra.json()['activities']:
+                    name = detail['name']
+                    distance = detail['distance']
+                    duration = detail['duration']
+                    description = detail['description']
+
+                exercise = Exercise()
+                exercise.name_original = name
+                exercise.name = name
+                exercise.category = ExerciseCategory.objects.get(name='Fitbit')
+                exercise.description = description
+                exercise.language = Language.objects.get(short_name='en')
+                exercise.save()
+            except Exception as error:
+                print('Err --> {}'.format(error))
+
+            # x = Fitbit(client_id, client_secret, access_token=token, refresh_token=None, expires_at=None, refresh_cb=None, redirect_uri='http://127.0.0.1:8000/en/user/add_fitbit', system='en_US')
+            # print('x --> {}'.format(x.user_profile_get(user_id)))
+
+            return HttpResponseRedirect(reverse('weight:overview',
+                                                kwargs={'username': request.user.username}))
+        else:
+            messages.warning(request, _('Something went wrong.'))
+        return render(request, 'user/add_fitbit.html', template_data)
+
+    # link to page that makes user authorize wger to access their fitbit
+    template_data['fitbit_auth_link'] = fitbit_client.authorize_token_url(redirect_uri='http://127.0.0.1:8000/en/user/add_fitbit')[0]
+    return render(request, 'user/add_fitbit.html', template_data)
