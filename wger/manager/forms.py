@@ -115,6 +115,7 @@ class SetFormMobile(ModelForm):
                                        label=_('Categories'),
                                        widget=TranslatedSelect(),
                                        required=False)
+
     exercise_list = ModelChoiceField(Exercise.objects)
 
     # We need to overwrite the init method here because otherwise Django
@@ -124,6 +125,29 @@ class SetFormMobile(ModelForm):
         super(SetFormMobile, self).__init__(*args, **kwargs)
         self.fields['exercise_list'].help_text = _('You can search for more than one exercise, '
                                                    'they will be grouped together for a superset.')
+
+
+class DropSetForm(ModelForm):
+    """Form for adding drop sets """
+    class Meta:
+        model = Set
+        exclude = ('order', 'excerciseday')
+        widgets = {'exercises': MultipleHiddenInput(),
+                   }
+
+        categories_list = ModelChoiceField(ExerciseCategory.objects.all(),
+                                           empty_label=_('All categories'),
+                                           label=_('Categories'),
+                                           widget=TranslatedSelect(),
+                                           required=False)
+        # filter the exercises according to the ones that use drop sets
+        drop_set_filter = ['Kettlebell', 'Barbell', 'Dumbbell']
+        exercise_list = ModelChoiceField(Exercise.objects.filter(equipment__name__in=drop_set_filter))
+
+        def __init__(self, *args, **kwargs):
+            super(SetFormMobile, self).__init__(*args, **kwargs)
+            self.fields['exercise_list'].help_text = _('You can search for more than one exercise, '
+                                                       'they will be grouped together for a superset.')
 
 
 class SettingForm(ModelForm):
