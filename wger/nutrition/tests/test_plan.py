@@ -14,12 +14,15 @@
 # along with Workout Manager.  If not, see <http://www.gnu.org/licenses/>.
 
 from django.core.urlresolvers import reverse
+from django.core.cache import cache
+import json
 
 from wger.core.tests import api_base_test
 from wger.core.tests.base_testcase import WorkoutManagerDeleteTestCase
 from wger.core.tests.base_testcase import WorkoutManagerEditTestCase
 from wger.core.tests.base_testcase import WorkoutManagerTestCase
 from wger.nutrition.models import NutritionPlan
+from wger.utils.cache import cache_mapper
 
 
 class PlanRepresentationTestCase(WorkoutManagerTestCase):
@@ -136,7 +139,8 @@ class PlanDailyCaloriesTestCase(WorkoutManagerTestCase):
         self.user_login('test')
 
         # Can't find goal calories text
-        response = self.client.get(reverse('nutrition:plan:view', kwargs={'id': 1}))
+        response = self.client.get(
+            reverse('nutrition:plan:view', kwargs={'id': 1}))
         self.assertFalse(response.context['plan'].has_goal_calories)
 
         self.assertEqual(response.status_code, 200)
@@ -154,10 +158,39 @@ class PlanDailyCaloriesTestCase(WorkoutManagerTestCase):
         plan.save()
 
         # Can find goal calories text
-        response = self.client.get(reverse('nutrition:plan:view', kwargs={'id': 1}))
+        response = self.client.get(
+            reverse('nutrition:plan:view', kwargs={'id': 1}))
         self.assertTrue(response.context['plan'].has_goal_calories)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'goal amount of calories')
+
+    def test_overview(self):
+        '''
+        Tests the overview
+        '''
+
+        # Plan has daily calories goal
+        self.user_login('test')
+
+        # Can find goal calories text
+        response = self.client.get(reverse('nutrition:plan:overview'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_caching(self):
+        '''
+        Tests setting of cache values
+        '''
+        self.user_login('test')
+        response = self.client.get(reverse('nutrition:plan:overview'))
+        self.assertEqual(response.status_code, 200)
+        plans = response.context['plans']
+        self.assertTrue(len(plans) > 0)
+        for plan in plans:
+            self.assertTrue(plan.cache_value is not None)
+            self.assertTrue(cache.get(
+                cache_mapper.get_nutrition_plan(plan.id)) is not None)
+            self.assertEqual(plan.cache_value, cache.get(
+                cache_mapper.get_nutrition_plan(plan.id)))
 
 
 class PlanApiTestCase(api_base_test.ApiBaseResourceTestCase):

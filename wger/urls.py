@@ -79,19 +79,19 @@ v1_api.register(core_api.DaysOfWeekResource())
 v1_api.register(core_api.UserProfileResource())
 v1_api.register(core_api.LicenseResource())
 
-
 # /api/v2 - django rest framework
+
 router = routers.DefaultRouter()
 
 # Manager app
-router.register(r'workout', manager_api_views.WorkoutViewSet,
-                base_name='workout')
-router.register(r'workoutsession', manager_api_views.WorkoutSessionViewSet,
-                base_name='workoutsession')
-router.register(r'schedulestep',
-                manager_api_views.ScheduleStepViewSet, base_name='schedulestep')
-router.register(r'schedule', manager_api_views.ScheduleViewSet,
-                base_name='schedule')
+
+router.register(r'workout', manager_api_views.WorkoutViewSet, base_name='workout')
+router.register(
+    r'workoutsession',
+    manager_api_views.WorkoutSessionViewSet,
+    base_name='workoutsession')
+router.register(r'schedulestep', manager_api_views.ScheduleStepViewSet, base_name='schedulestep')
+router.register(r'schedule', manager_api_views.ScheduleViewSet, base_name='schedule')
 router.register(r'day', manager_api_views.DayViewSet, base_name='day')
 router.register(r'set', manager_api_views.SetViewSet, base_name='Set')
 router.register(r'setting', manager_api_views.SettingViewSet,
@@ -100,17 +100,19 @@ router.register(r'workoutlog', manager_api_views.WorkoutLogViewSet,
                 base_name='workoutlog')
 
 # Core app
-router.register(r'userprofile', core_api_views.UserProfileViewSet,
-                base_name='userprofile')
-router.register(r'language', core_api_views.LanguageViewSet,
-                base_name='language')
-router.register(r'daysofweek', core_api_views.DaysOfWeekViewSet,
-                base_name='daysofweek')
+
+router.register(r'userprofile', core_api_views.UserProfileViewSet, base_name='userprofile')
+router.register(r'user/register', core_api_views.RegisterUserViewSet, base_name='registeruser')
+router.register(r'language', core_api_views.LanguageViewSet, base_name='language')
+router.register(r'daysofweek', core_api_views.DaysOfWeekViewSet, base_name='daysofweek')
 router.register(r'license', core_api_views.LicenseViewSet, base_name='license')
-router.register(r'setting-repetitionunit', core_api_views.RepetitionUnitViewSet,
+router.register(r'setting-repetitionunit',
+                core_api_views.RepetitionUnitViewSet,
                 base_name='setting-repetition-unit')
-router.register(r'setting-weightunit', core_api_views.WeightUnitViewSet,
-                base_name='setting-weight-unit')
+router.register(
+    r'setting-weightunit',
+    core_api_views.WeightUnitViewSet,
+    base_name='setting-weight-unit')
 
 # Exercises app
 router.register(r'exerciseinfo',
@@ -137,6 +139,7 @@ router.register(r'ingredientweightunit',
                 nutrition_api_views.IngredientWeightUnitViewSet, base_name='ingredientweightunit')
 router.register(r'nutritionplan', nutrition_api_views.NutritionPlanViewSet,
                 base_name='nutritionplan')
+
 router.register(r'meal', nutrition_api_views.MealViewSet, base_name='meal')
 router.register(r'mealitem', nutrition_api_views.MealItemViewSet,
                 base_name='mealitem')
@@ -145,8 +148,8 @@ router.register(r'mealitem', nutrition_api_views.MealItemViewSet,
 router.register(r'weightentry', weight_api_views.WeightEntryViewSet,
                 base_name='weightentry')
 
-
 from django.contrib import admin
+
 admin.autodiscover()
 
 #

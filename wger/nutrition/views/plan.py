@@ -71,13 +71,13 @@ def overview(request):
 
     plans = NutritionPlan.objects.filter(user=request.user)
     for plan in plans:
-        cache_value = cache.get(cache_mapper.get_nutrition_plan(int(plan.id)))
-        if not cache_value:
+        plan.cache_value = cache.get(
+            cache_mapper.get_nutrition_plan(int(plan.id)))
+        if not plan.cache_value:
             cache.set(cache_mapper.get_nutrition_plan(int(plan.id)),
                       plan.get_nutritional_values()['total']['energy'])
-            plan.cache_value = cache.get(cache_mapper.get_nutrition_plan(int(plan.id)))
-        else:
-            plan.cache_value = cache_value
+            plan.cache_value = cache.get(
+                cache_mapper.get_nutrition_plan(int(plan.id)))
     template_data['plans'] = plans
 
     return render(request, 'plan/overview.html', template_data)
@@ -279,7 +279,8 @@ def export_pdf(request, id, uidb64=None, token=None):
         for item in meal.mealitem_set.select_related():
             ingredient_markers.append(len(data))
 
-            p = Paragraph(u'<para>{0}</para>'.format(item.ingredient.name), styleSheet["Normal"])
+            p = Paragraph(
+                u'<para>{0}</para>'.format(item.ingredient.name), styleSheet["Normal"])
             if item.get_unit_type() == MEALITEM_WEIGHT_GRAM:
                 unit_name = 'g'
             else:
@@ -294,8 +295,10 @@ def export_pdf(request, id, uidb64=None, token=None):
     # Set specific styles, e.g. background for title cells
     for marker in meal_markers:
         # Set background colour for headings
-        table_style.append(('BACKGROUND', (0, marker), (-1, marker), header_colour))
-        table_style.append(('BOX', (0, marker), (-1, marker), 1.25, colors.black))
+        table_style.append(
+            ('BACKGROUND', (0, marker), (-1, marker), header_colour))
+        table_style.append(
+            ('BOX', (0, marker), (-1, marker), 1.25, colors.black))
 
         # Make the headings span the whole width
         table_style.append(('SPAN', (0, marker), (-1, marker)))
@@ -337,8 +340,10 @@ def export_pdf(request, id, uidb64=None, token=None):
     data.append([Paragraph(_('Energy'), styleSheet["Normal"]),
                  Paragraph(six.text_type(plan_data['total']['energy']), styleSheet["Normal"])])
     data.append([Paragraph(_('Protein'), styleSheet["Normal"]),
-                 Paragraph(six.text_type(plan_data['total']['protein']), styleSheet["Normal"]),
-                 Paragraph(six.text_type(plan_data['percent']['protein']), styleSheet["Normal"]),
+                 Paragraph(six.text_type(plan_data['total'][
+                           'protein']), styleSheet["Normal"]),
+                 Paragraph(six.text_type(plan_data['percent'][
+                           'protein']), styleSheet["Normal"]),
                  Paragraph(six.text_type(plan_data['per_kg']['protein']), styleSheet["Normal"])])
     data.append([Paragraph(_('Carbohydrates'), styleSheet["Normal"]),
                  Paragraph(six.text_type(plan_data['total']['carbohydrates']),
@@ -351,8 +356,10 @@ def export_pdf(request, id, uidb64=None, token=None):
                  Paragraph(six.text_type(plan_data['total']['carbohydrates_sugar']),
                            styleSheet["Normal"])])
     data.append([Paragraph(_('Fat'), styleSheet["Normal"]),
-                 Paragraph(six.text_type(plan_data['total']['fat']), styleSheet["Normal"]),
-                 Paragraph(six.text_type(plan_data['percent']['fat']), styleSheet["Normal"]),
+                 Paragraph(six.text_type(plan_data['total'][
+                           'fat']), styleSheet["Normal"]),
+                 Paragraph(six.text_type(plan_data['percent'][
+                           'fat']), styleSheet["Normal"]),
                  Paragraph(six.text_type(plan_data['per_kg']['fat']), styleSheet["Normal"])])
     data.append([Paragraph(_('Saturated fat content in fats'), styleSheet["Normal"]),
                  Paragraph(six.text_type(plan_data['total']['fat_saturated']),
