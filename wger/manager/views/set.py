@@ -34,7 +34,8 @@ from wger.manager.forms import (
     SetForm,
     SetFormMobile,
     SettingForm,
-    DropSetForm
+    DropSetForm,
+    DropSetFormMobile,
 )
 from wger.utils.language import load_item_languages
 from wger.config.models import LanguageConfig
@@ -67,9 +68,9 @@ def create_drop_set(request, day_pk):
     # exercises, but 2 dropdowns, one to filter by category and one to select
     # the exercises themselves.
     if request.flavour == 'mobile':
-        form_class = SetFormMobile
+        form_class = DropSetFormMobile
     else:
-        form_class = SetForm
+        form_class = DropSetForm
 
     context = {}
     formsets = []
@@ -122,7 +123,7 @@ def create_drop_set(request, day_pk):
     context['day'] = day
     context['max_sets'] = Set.MAX_SETS
     context['formsets'] = formsets
-    context['form_action'] = reverse('manager:set:add', kwargs={'day_pk': day_pk})
+    context['form_action'] = reverse('manager:set:add_dropset', kwargs={'day_pk': day_pk})
     context['extend_template'] = 'base_empty.html' if request.is_ajax() else 'base.html'
     return render(request, 'set/drop_sets.html', context)
 
