@@ -44,14 +44,14 @@ from wger.core.models import Language
 from rest_framework import status
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication, \
     TokenAuthentication
-from wger.utils.permissions import UpdateOnlyPermission, WgerPermission
+from wger.utils.permissions import UpdateOnlyPermission, WgerPermission, ApiRegistrationPermission
 from django.utils import translation
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 from wger.config.models import GymConfig
-
+from rest_framework.permissions import AllowAny
 
 class RegisterUserViewSet(viewsets.ModelViewSet):
     """
@@ -60,7 +60,9 @@ class RegisterUserViewSet(viewsets.ModelViewSet):
     serializer_class = UserRegistrationSerializer
     http_method_names = ['post']
     authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, ApiRegistrationPermission, AllowAny,)
+    
 
     def create(self, request):
         # Creates a user and assign them a default gym

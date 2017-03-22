@@ -9,6 +9,9 @@ dictionary in your settings file. Currently the following options are supported:
 **ALLOW_REGISTRATION**: Default ``True``.
   Controls whether users can register on their own or if a gym adminstrator has
   to create the user accounts.
+  
+**ALLOW_API_REGISTRATION**: Default ``False``.
+ Controls whether users can register via the API
 
 **ALLOW_GUEST_USERS**: Default ``True``.
   Controls whether users can use the site as a guest user or if an administrator

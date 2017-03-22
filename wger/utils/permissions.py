@@ -15,7 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Workout Manager.  If not, see <http://www.gnu.org/licenses/>.
 
-from rest_framework import permissions
+from rest_framework import permissions, exceptions
+from django.conf import settings
+
 
 
 class WgerPermission(permissions.BasePermission):
@@ -82,3 +84,17 @@ class UpdateOnlyPermission(permissions.BasePermission):
         return (request.user and
                 request.user.is_authenticated() and
                 request.method in ['GET', 'HEAD', 'OPTIONS', 'PATCH'])
+
+class ApiRegistrationPermission(permissions.BasePermission):
+    """
+    Custom API Registration Permissions
+    """
+    expects_authentication = False
+    authenticated_users_only = False
+
+    def has_permission(self, request, view):
+        message = "User Registration Via API is currently deactivated"
+        if settings.WGER_SETTINGS['ALLOW_API_REGISTRATION']:
+            return True
+
+        raise exceptions.PermissionDenied(message)
