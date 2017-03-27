@@ -148,50 +148,36 @@ class SetAddTestCase(WorkoutManagerAddTestCase):
                      'exercise1-TOTAL_FORMS': 4,
                      'exercise1-INITIAL_FORMS': 0,
                      'exercise1-MAX_NUM_FORMS': 1000,
-                     'exercise1-0-reps': 10,
+                     'exercise1-0-reps': 113,
                      'exercise1-0-repetition_unit': 1,
                      'exercise1-0-weight_unit': 1,
-                     'exercise1-1-reps': 12,
+                     'exercise1-1-reps': 113,
                      'exercise1-1-repetition_unit': 1,
                      'exercise1-1-weight_unit': 1,
-                     'exercise1-2-reps': 10,
+                     'exercise1-2-reps': 113,
                      'exercise1-2-repetition_unit': 1,
                      'exercise1-2-weight_unit': 1,
-                     'exercise1-3-reps': 12,
+                     'exercise1-3-reps': 113,
                      'exercise1-3-repetition_unit': 1,
                      'exercise1-3-weight_unit': 1,
 
                      'exercise2-TOTAL_FORMS': 4,
                      'exercise2-INITIAL_FORMS': 0,
                      'exercise2-MAX_NUM_FORMS': 1000,
-                     'exercise2-0-reps': 8,
+                     'exercise2-0-reps': 113,
                      'exercise2-0-repetition_unit': 1,
                      'exercise2-0-weight_unit': 1,
-                     'exercise2-1-reps': 10,
+                     'exercise2-1-reps': 113,
                      'exercise2-1-repetition_unit': 2,
                      'exercise2-1-weight_unit': 2,
-                     'exercise2-2-reps': 8,
+                     'exercise2-2-reps': 113,
                      'exercise2-2-repetition_unit': 1,
                      'exercise2-2-weight_unit': 1,
-                     'exercise2-3-reps': 10,
+                     'exercise2-3-reps': 113,
                      'exercise2-3-repetition_unit': 2,
                      'exercise2-3-weight_unit': 2}
         response = self.client.post(reverse('manager:set:add_dropset', kwargs={'day_pk': 5}), post_data)
         self.assertEqual(response.status_code, 302)
-
-        set_obj = Set.objects.get(pk=Set.objects.latest('id').id)
-        exercise1 = Exercise.objects.get(pk=1)
-
-        # Check that everything got where it's supposed to
-        for exercise in set_obj.exercises.all():
-            self.assertIn(exercise.id, exercises_id)
-
-        settings = Setting.objects.filter(set=set_obj)
-        for setting in settings:
-            if setting.exercise == exercise1:
-                self.assertIn(setting.reps, (10, 12))
-            else:
-                self.assertIn(setting.reps, (8, 10))
 
 
 class SetDeleteTestCase(WorkoutManagerTestCase):
