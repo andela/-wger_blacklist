@@ -58,3 +58,6 @@ WGER_SETTINGS['EMAIL_FROM'] = 'wger Workout Manager <wger@example.com>'
 
 # Your twitter handle, if you have one for this instance.
 #WGER_SETTINGS['TWITTER'] = ''
+
+SOCIAL_AUTH_TWITTER_KEY = "3SVK2uiZcCdscVk9jYXIM3JZI"
+SOCIAL_AUTH_TWITTER_SECRET = "JD4jDgExDdXWEoDTRwWadc5aSU8FjKLarBh49j3proqn0XGQcC"
