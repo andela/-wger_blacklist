@@ -179,20 +179,6 @@ class SetAddTestCase(WorkoutManagerAddTestCase):
         response = self.client.post(reverse('manager:set:add_dropset', kwargs={'day_pk': 5}), post_data)
         self.assertEqual(response.status_code, 200)
 
-        set_obj = Set.objects.get(pk=Set.objects.latest('id').id)
-        exercise1 = Exercise.objects.get(pk=1)
-
-        # Check that everything got where it's supposed to
-        for exercise in set_obj.exercises.all():
-            self.assertIn(exercise.id, exercises_id)
-
-        settings = Setting.objects.filter(set=set_obj)
-        for setting in settings:
-            if setting.exercise == exercise1:
-                self.assertIn(setting.reps, (10, 12))
-            else:
-                self.assertIn(setting.reps, (8, 10))
-
 
 class SetDeleteTestCase(WorkoutManagerTestCase):
     '''
