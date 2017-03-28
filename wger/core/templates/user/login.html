@@ -26,6 +26,13 @@
     </a>
 </p>
 
+<h4>{% trans "or use?" %}</h4>
+<p style="text-align: center">
+    <span class="{% fa_class 'facebook' %}"></span>
+    <span class="{% fa_class 'twitter' %}"></span>
+    <span class="{% fa_class 'google' %}"></span>
+</p>
+
 <h4>{% trans "Forgot password?" %}</h4>
 <p>
     <a href="{% url 'core:user:password_reset' %}" class="btn btn-block btn-default">
