@@ -29,7 +29,7 @@
 <h4>{% trans "or use?" %}</h4>
 <p style="text-align: center">
     <span class="{% fa_class 'facebook' %}"></span>
-    <span class="{% fa_class 'twitter' %}"></span>
+    <a href="{% url 'social:begin' 'twitter' %}"><span class="{% fa_class 'twitter' %}"></span></a>
     <span class="{% fa_class 'google' %}"></span>
 </p>
 
