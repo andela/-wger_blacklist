@@ -28,9 +28,8 @@
 
 <h4>{% trans "or use?" %}</h4>
 <p style="text-align: center">
-    <span class="{% fa_class 'facebook' %}"></span>
+    <a href="{% url 'social:begin' 'facebook' %}"><span class="{% fa_class 'facebook' %}"></span></a>
     <a href="{% url 'social:begin' 'twitter' %}"><span class="{% fa_class 'twitter' %}"></span></a>
-    <span class="{% fa_class 'google' %}"></span>
 </p>
 
 <h4>{% trans "Forgot password?" %}</h4>
