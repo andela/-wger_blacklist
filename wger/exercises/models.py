@@ -81,9 +81,9 @@ class Muscle(models.Model):
 
 @python_2_unicode_compatible
 class Equipment(models.Model):
-    '''
+    """
     Equipment used or needed by an exercise
-    '''
+    """
 
     name = models.CharField(max_length=50,
                             verbose_name=_('Name'))
