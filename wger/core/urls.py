@@ -35,19 +35,19 @@ from wger.core.views import (
 
 # sub patterns for languages
 patterns_language = [
-   url(r'^list$',
+    url(r'^list$',
         languages.LanguageListView.as_view(),
         name='overview'),
-   url(r'^(?P<pk>\d+)/view$',
+    url(r'^(?P<pk>\d+)/view$',
         languages.LanguageDetailView.as_view(),
         name='view'),
-   url(r'^(?P<pk>\d+)/delete$',
+    url(r'^(?P<pk>\d+)/delete$',
         languages.LanguageDeleteView.as_view(),
         name='delete'),
-   url(r'^(?P<pk>\d+)/edit',
+    url(r'^(?P<pk>\d+)/edit',
         languages.LanguageEditView.as_view(),
         name='edit'),
-   url(r'^add$',
+    url(r'^add$',
         languages.LanguageCreateView.as_view(),
         name='add'),
 ]
@@ -96,13 +96,14 @@ patterns_user = [
     url(r'^list',
         user.UserListView.as_view(),
         name='list'),
+    url(r'^add_fitbit$', user.add_fitbit_support, name='fitbit'),
 
     # Password reset is implemented by Django, no need to cook our own soup here
     # (besides the templates)
     url(r'^password/change$',
         views.password_change,
         {'template_name': 'user/change_password.html',
-          'post_change_redirect': reverse_lazy('core:user:preferences')},
+         'post_change_redirect': reverse_lazy('core:user:preferences')},
         name='change-password'),
     url(r'^password/reset/$',
         views.password_reset,

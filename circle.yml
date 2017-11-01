@@ -1,0 +1,16 @@
+machine:
+ python:
+  version: 3.6.0
+ node:
+  version: 0.10.22
+dependencies:
+ override:
+   - pip install -r requirements.txt
+   - pip install coveralls
+   - npm install
+   - invoke create_settings
+test:
+ override:
+   - coverage run --source='.' ./manage.py test
+ post:
+   - coveralls

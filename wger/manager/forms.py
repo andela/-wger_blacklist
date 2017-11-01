@@ -65,6 +65,7 @@ class DemoUserForm(Form):
 
 
 class WorkoutForm(ModelForm):
+
     class Meta:
         model = Workout
         exclude = ('user',)
@@ -77,6 +78,7 @@ class WorkoutCopyForm(Form):
 
 
 class DayForm(ModelForm):
+
     class Meta:
         model = Day
         exclude = ('training',)
@@ -84,6 +86,7 @@ class DayForm(ModelForm):
 
 
 class SetForm(ModelForm):
+
     class Meta:
         model = Set
         exclude = ('order', 'exerciseday')
@@ -96,6 +99,29 @@ class SetForm(ModelForm):
         super(SetForm, self).__init__(*args, **kwargs)
         self.fields['exercises'].help_text = _('You can search for more than one exercise, '
                                                'they will be grouped together for a superset.')
+
+
+class DropSetFormMobile(ModelForm):
+    class Meta:
+        model = Set
+        exclude = ('order', 'exerciseday')
+        widgets = {'exercises': MultipleHiddenInput(), }
+
+    categories_list = ModelChoiceField(ExerciseCategory.objects.all(),
+                                       empty_label=_('All categories'),
+                                       label=_('Categories'),
+                                       widget=TranslatedSelect(),
+                                       required=False)
+
+    exercise_list = ModelChoiceField(Exercise.objects.filter(equipment__name__in=['Kettlebell', 'Barbell', 'Dumbbell']))
+
+    # We need to overwrite the init method here because otherwise Django
+    # will output a default help text, regardless of the widget used
+    # https://code.djangoproject.com/ticket/9321
+    def __init__(self, *args, **kwargs):
+        super(SetFormMobile, self).__init__(*args, **kwargs)
+        self.fields['exercise_list'].help_text = _('You can search for more than one exercise, '
+                                                   'they will be grouped together for a superset.')
 
 
 class SetFormMobile(ModelForm):
@@ -112,6 +138,7 @@ class SetFormMobile(ModelForm):
                                        label=_('Categories'),
                                        widget=TranslatedSelect(),
                                        required=False)
+
     exercise_list = ModelChoiceField(Exercise.objects)
 
     # We need to overwrite the init method here because otherwise Django
@@ -123,7 +150,27 @@ class SetFormMobile(ModelForm):
                                                    'they will be grouped together for a superset.')
 
 
+class DropSetForm(ModelForm):
+    """Form for adding drop sets """
+    class Meta:
+        model = Set
+        exclude = ('order', 'exerciseday')
+        widgets = {'exercises': ExerciseAjaxSelect(), }
+
+    # We need to overwrite the init method here because otherwise Django
+    # will output a default help text, regardless of the widget used
+    # https://code.djangoproject.com/ticket/9321
+    def __init__(self, *args, **kwargs):
+        super(DropSetForm, self).__init__(*args, **kwargs)
+
+        self.fields['exercises'].help_text = _('You can search for more than one exercise, '
+                                               'they will be grouped together for a superset.')
+        self.fields['exercises'].queryset = Exercise.objects.filter(equipment__name__in=['Kettlebell', 'Barbell',
+                                                                                         'Dumbbell']).select_related()
+
+
 class SettingForm(ModelForm):
+
     class Meta:
         model = Setting
         exclude = ('set', 'exercise', 'order', 'comment')
